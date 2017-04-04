@@ -201,11 +201,13 @@
                         window.location.replace('{{ url("cnpibk") }}');
                     }, 1000);
               }else{
-                  $("#notif").html('<div class="alert alert-error"><strong>Error!</strong> '+data.response+'</div>');
+                  $("#notif").html('<div class="alert alert-error"><strong>Error!</strong> '+data.response[0]+'</div>');
                   $('html, body')
                     .animate({
                         scrollTop: $("#notif").position().top
                     }, 'slow');
+                    $(e).prop("disabled",false);
+                    $(e).text("Kirim Ke Bea Cukai");
               }
           });
       }

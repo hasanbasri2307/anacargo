@@ -528,11 +528,11 @@ class CnpibkController extends Controller
 				$header->addChild("NO_HOUSE_BLAWB",(!empty($cnpibk->no_house_blawb) ? $this->clean($cnpibk->no_house_blawb) : ''));
 				$header->addChild("TGL_HOUSE_BLAWB",(!empty($cnpibk->tgl_house_blawb) ? date('Y/m/d',strtotime($cnpibk->tgl_house_blawb)) : '0000/00/00'));
 				$header->addChild("KD_NEG_PENGIRIM",(!empty($cnpibk->kd_negara_pengirim) ? $cnpibk->kd_negara_pengirim : ''));
-				$header->addChild("NM_PENGIRIM",(!empty($cnpibk->nm_pengirim) ? $cnpibk->nm_pengirim : ''));
+				$header->addChild("NM_PENGIRIM",(!empty($cnpibk->nm_pengirim) ? htmlspecialchars($cnpibk->nm_pengirim) : ''));
 				$header->addChild("AL_PENGIRIM",(!empty($cnpibk->al_pengirim) ? $cnpibk->al_pengirim : ''));
 				$header->addChild("JNS_ID_PENERIMA",$cnpibk->id_penerima->jns_id);
 				$header->addChild("NO_ID_PENERIMA",$this->clean($cnpibk->customer->npwp));
-				$header->addChild("NM_PENERIMA",$cnpibk->customer->name);
+				$header->addChild("NM_PENERIMA",htmlspecialchars($cnpibk->customer->name));
 				$header->addChild("AL_PENERIMA",$cnpibk->customer->address);
 				$header->addChild("TELP_PENERIMA",(!empty($cnpibk->customer->phone_1) ? $cnpibk->customer->phone_1 : ''));
 				$header->addChild("JNS_ID_PEMBERITAHU",$cnpibk->id_pemberitahu->jns_id);
@@ -551,7 +551,7 @@ class CnpibkController extends Controller
 				$header->addChild("BRUTO",(!empty($cnpibk->bruto) ? $cnpibk->bruto : '0.00'));
 				$header->addChild("TOT_DIBAYAR",(!empty($cnpibk->tot_dibayar) ? $cnpibk->tot_dibayar : '0.00'));
 				$header->addChild("NPWP_BILLING",(!empty($cnpibk->npwp_billing) ? $this->clean($cnpibk->npwp_billing) : '0.00'));
-				$header->addChild("NAMA_BILLING",(!empty($cnpibk->nama_billing) ? $cnpibk->nama_billing : 'NA'));
+				$header->addChild("NAMA_BILLING",(!empty($cnpibk->nama_billing) ? htmlspecialchars($cnpibk->nama_billing) : 'NA'));
 
 				if(count($header_pungutan) > 0){
 					$header_pungutan_xml = $header->addChild("HEADER_PUNGUTAN");
