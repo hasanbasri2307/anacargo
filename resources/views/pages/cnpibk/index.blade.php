@@ -109,20 +109,7 @@
                               Status Code : {{ $item->status_code->kode }}<br> Uraian : {{ $item->status_code->uraian }}<br> Ket: {{ !empty($history->ket_respon) ? $history->ket_respon : "-" }}
                               
                           </td>
-                          <td>
-                            @if($item->tipe_dokumen == "cn")
-                              @if($item->status_code->kode != 203)
-                                <button type="button" data-id="{{ $item->id }}" class="btn btn-sm btn-danger kirim-bea-cukai" onclick="kirimBeaCukai(this)">Kirim Ke Bea Cukai</button>
-                              @else
-                                -
-                              @endif
-                            @elseif($item->tipe_dokumen == "pibk")
-                              @if($item->status_code->kode != 303)
-                                <button type="button" data-id="{{ $item->id }}" class="btn btn-sm btn-danger kirim-bea-cukai" onclick="kirimBeaCukai(this)">Kirim Ke Bea Cukai</button>
-                              @else
-                                -
-                              @endif
-                            @endif
+                          <td><button type="button" data-id="{{ $item->id }}" class="btn btn-sm btn-danger kirim-bea-cukai" onclick="kirimBeaCukai(this)">Kirim Ke Bea Cukai</button>
                           </td>
                           <td>
                                 <div class="btn-group">
@@ -214,15 +201,11 @@
                         window.location.replace('{{ url("cnpibk") }}');
                     }, 1000);
               }else{
-                  $("#notif").html('<div class="alert alert-error"><strong>Erro!</strong> Ada Kesalahan, silahkan coba lagi nanti.</div>');
+                  $("#notif").html('<div class="alert alert-error"><strong>Error!</strong> '+data.response+'</div>');
                   $('html, body')
                     .animate({
                         scrollTop: $("#notif").position().top
                     }, 'slow');
-
-                    window.setTimeout(function() {
-                        window.location.replace('{{ url("cnpibk") }}');
-                    }, 1000);
               }
           });
       }

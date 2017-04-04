@@ -608,6 +608,11 @@ class CnpibkController extends Controller
 				);
 				$response = $webServiceClient->__soapCall("kirimData", array("kirimData" => $requestData));
 						$respon_string= simplexml_load_string($response->return);
+                        $status_code = $respon_string->HEADER->KD_RESPON;
+
+                        if($status_code == "ERR"){
+                            return response()->json(['status'=>false,'response'=>$respon_string->HEADER->KET_RESPON]);
+                        }
 
 						DB::transaction(function () use($respon_string,$id) {
 							//set latest status code
