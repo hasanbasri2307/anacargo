@@ -442,9 +442,9 @@
         <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Header Pungutan</h3>
-              <div class="col-xs-4 pull-right">
+              {{-- <div class="col-xs-4 pull-right">
                     <button class="btn btn-primary pull-right" id="tambah_header" type="buton">Tambah Header</button>
-              </div>
+              </div> --}}
             </div>
             
             <!-- /.box-header -->
@@ -463,14 +463,10 @@
 
                       <tr>
                         <input type="hidden" class="header_pungutan_id" value="{{ $item->id }}" name="header_pungutan_id[]">
-                        <td>{!! Form::select("kd_pungutan[]",$jenis_pungutan,$item->kd_pungutan,['class'=>'form-control kd-pungutan']) !!}</td>
-                       
-                        <td>
-                           {!! Form::text("nilai[]",$item->nilai,['class'=>"form-control nilai","placeholder"=>"Nilai"]) !!}
-                        </td>
-                        <td>
-                            <button class="btn btn-danger hapus" type="button" onclick="hapus_header_pungutan(this)">Hapus</button>
-                        </td>
+                         <td>{!! Form::text("k_pungutan[]",$item->pungutan->nama_pungutan,['class'=>'form-control k-pungutan','readonly'=>true]) !!} {!! Form::hidden("kd_pungutan[]",$item->kd_pungutan,['class'=>'form-control kd-pungutan','readonly'=>true]) !!}</td>
+                      <td>{!! Form::text("nilai[]",$item->nilai,['class'=>'form-control nilai','placeholder'=>"Nilai","readonly"=>true]) !!}</td>
+                      <td></td>
+                        
                        
                       </tr>
                     @endforeach
@@ -518,7 +514,7 @@
                       
                       <tr>
                         <input type="hidden" name="detail_barang_id[]" value="{{ $item->id }}" class="detail_barang_id">
-                        <td><button type="button" class="btn btn-primary tambah_pungutan" disabled="true" onclick="tambah_pungutan(this)">Tambah Pungutan</button></td>
+                        <td></td>
                         <td>{!! Form::text("seri_brg[]",$item->seri_brg,['class'=>"form-control seri-brg","placeholder"=>"Seri Barang",'maxlength'=>6,'onkeyup'=>'check_seri(this)']) !!}</td>
                         <td>{!! Form::text("hs_code[]",$item->hs_code,['class'=>"form-control hs-code","placeholder"=>"HS Code",'maxlength'=>12,'onkeyup'=>'check_hs(this)']) !!}</td>
                         <td>{!! Form::textarea("ur_brg[]",$item->ur_brg,['class'=>"form-control","placeholder"=>"Uraian Barang",'maxlength'=>140,'rows'=>3,'cols'=>20]) !!}</td>
@@ -573,12 +569,12 @@
                         <input type="hidden" name="detail_pungutan_id[]" value="{{ $item->idnya }}" class="detail_pungutan_id">
                         <td><input type="text" value="{{ $item->seri_brg }}" class="form-control seri-brg-detail" name="seri-brg-detail[]" readonly></td>
                         <td><input type="text" value="{{ $item->hs_code }}" class="form-control hs-code-detail" name="hs-code-detail[]" readonly></td>
-                        <td><input type="hidden" name="kd_pungutan_detail[]" value="{{ $item->kd_pungutan }}" class="kd_pungutan_detail"><input type="text" value="{{ $item->kd_pungutan }}" class="form-control" readonly></td>
-                        <td><input type="text" value="{{ $item->nilai }}" class="form-control" name="nilai_detail[]" readonly></td>
+                        <td><input type="hidden" name="kd_pungutan_detail[]" value="{{ $item->kd_pungutan }}" class="kd_pungutan_detail"><input type="text" value="{{ $item->nama_pungutan }}" class="form-control k-pungutan-detail" readonly></td>
+                        <td><input type="text" value="{{ $item->nilai }}" class="form-control nilai-detail" name="nilai_detail[]"></td>
                         <td>{!! Form::text("jenis_tarif_detail[]",$item->jns_tarif,['class'=>"form-control","placeholder"=>"Jenis Tarif"]) !!}</td>
                         <td>{!! Form::select("kd_tarif_detail[]",$jenis_tarif,$item->kd_tarif,['class'=>'form-control']) !!}</td>
-                       <td>{!! Form::text("kd_sat_tarif_detail[]",$item->kd_sat_tarif,['class'=>"form-control","placeholder"=>"Kode Satuan Tarif"]) !!}</td>
-                        <td>{!! Form::text("jml_sat_detail[]",$item->jml_sat,['class'=>"form-control","placeholder"=>"Jumlah Satuan"]) !!}</td>
+                       <td>{!! Form::text("kd_sat_tarif_detail[]",$item->kd_sat_tarif,['class'=>"form-control","placeholder"=>"Kode Satuan Tarif","readonly"=>true]) !!}</td>
+                        <td>{!! Form::text("jml_sat_detail[]",$item->jml_sat,['class'=>"form-control","placeholder"=>"Jumlah Satuan","readonly"=>true]) !!}</td>
                         <td> {!! Form::text("tarif_detail[]",$item->tarif,['class'=>"form-control","placeholder"=>"Tarif"]) !!}</td>
                       </tr>
                     @endforeach
@@ -594,7 +590,8 @@
           <div class="box box-primary">
               <div class="box-footer">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-primary" id="btn_simpan">Simpan</button>
+                <button type="button" class="btn btn-primary" id="btn_hitung_header">Hitung Nilai Header</button>
+                <button type="submit" class="btn btn-primary" id="btn_simpan" disabled>Simpan</button>
                 <a href="{{ url()->previous() }}"><button type="button" class="btn btn-default">Batal</button></a>
               </div>
           </div>
@@ -643,19 +640,21 @@
             var $detail_pungutan ='<tr>'+
                              '<td><input type="text" value="'+$(e).parent().parent().find('.seri-brg').val()+'" class="form-control seri-brg-detail" name="seri-brg-detail[]" readonly></td>'+
                              '<td><input type="text" value="'+$(e).parent().parent().find('.hs-code').val()+'" class="form-control hs-code-detail" name="hs-code-detail[]" readonly></td>'+
-                             '<td><input type="hidden" name="kd_pungutan_detail[]" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".kd-pungutan").val()+'" class="kd_pungutan_detail"><input type="text" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".kd-pungutan :selected").text()+'" class="form-control" readonly></td>'+
-                             '<td><input type="text" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val()+'" class="form-control" name="nilai_detail[]" readonly></td>'+
+                             '<td><input type="hidden" name="kd_pungutan_detail[]" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".kd-pungutan").val()+'" class="kd_pungutan_detail"><input type="text" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".k-pungutan").val()+'" class="form-control k-pungutan-detail" readonly></td>'+
+                             '<td><input type="text" value="0" class="form-control nilai-detail" name="nilai_detail[]" ></td>'+
                              '<td>{!! Form::text("jenis_tarif_detail[]",old("jenis_tarif_detail"),['class'=>"form-control","placeholder"=>"Jenis Tarif"]) !!}</td>'+
                              '<td>{!! Form::select("kd_tarif_detail[]",$jenis_tarif,null,['class'=>'form-control']) !!}</td>'+
-                             '<td>{!! Form::text("kd_sat_tarif_detail[]",old("kd_sat_tarif_detail"),['class'=>"form-control","placeholder"=>"Kode Satuan Tarif"]) !!}</td>'+
-                             '<td>{!! Form::text("jml_sat_detail[]",old("jml_sat_detail"),['class'=>"form-control","placeholder"=>"Jumlah Satuan"]) !!}</td>'+
-                             '<td> {!! Form::text("tarif_detail[]",old("tarif_detail"),['class'=>"form-control","placeholder"=>"Tarif"]) !!}</td><input type="hidden" name="detail_pungutan_id[]" value="">'+
+                             '<td>{!! Form::text("kd_sat_tarif_detail[]",1,['class'=>"form-control","placeholder"=>"Kode Satuan Tarif","readonly"=>true]) !!}</td>'+
+                             '<td>{!! Form::text("jml_sat_detail[]",0,['class'=>"form-control","placeholder"=>"Jumlah Satuan","readonly"=>true]) !!}</td>'+
+                             '<td> {!! Form::text("tarif_detail[]",old("tarif_detail"),['class'=>"form-control","placeholder"=>"Tarif"]) !!}</td>'+
                              
                             '</tr>';
             $("#detail_pungutan").append($detail_pungutan);
+
         }
   
         $("#detail_pungutan").append(detail_pungutan);
+        $(e).remove();
     }
 
     function hapus_detail_barang(e){
@@ -748,6 +747,51 @@
              
                 $("input[name='nm_jenis_angkut']").val(data.data.nama_angkutan);
             });
+        });
+
+        $("#btn_hitung_header").click(function(e){
+            e.preventDefault();
+            var count = $("#detail_pungutan tr").length;
+            var BM = 0;
+            var PPH = 0;
+            var PPN = 0;
+            var PPNBM = 0;
+
+            for(var i = 1; i < count ;i++){
+                var tr_start = i+1;
+                var kd_pungutan = $('#detail_pungutan tr:nth-child('+tr_start+')').find(".k-pungutan-detail").val();
+                var nilai_detail = parseFloat($('#detail_pungutan tr:nth-child('+tr_start+')').find(".nilai-detail").val());
+
+                if(kd_pungutan == 'BM'){
+                   BM += nilai_detail;
+                }else if(kd_pungutan == 'PPH'){
+                   PPH += nilai_detail;
+                }else if(kd_pungutan == 'PPN'){
+                   PPN += nilai_detail;
+                }else if(kd_pungutan == 'PPNBM'){
+                   PPNBM += nilai_detail;
+                }
+            }
+
+            var count_header = $("#header_pungutan").length;
+            for(var i = 1; i < count ;i++){
+                var tr_start = i+1;
+                var kd_pungutan = $('#header_pungutan tr:nth-child('+tr_start+')').find(".k-pungutan").val();
+                if(kd_pungutan == 'BM'){
+                   $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(BM);
+                }else if(kd_pungutan == 'PPH'){
+                   $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(PPH);
+                }else if(kd_pungutan == 'PPN'){
+                   $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(PPN);
+                }else if(kd_pungutan == 'PPNBM'){
+                   $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(PPNBM);
+                }
+            }
+
+
+
+            $("#btn_simpan").prop("disabled",false);
+
         });
 
         $("#tambah_header").click(function(e){

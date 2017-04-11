@@ -439,9 +439,9 @@
         <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Header Pungutan</h3>
-              <div class="col-xs-4 pull-right">
+              {{-- <div class="col-xs-4 pull-right">
                     <button class="btn btn-primary pull-right" id="tambah_header" type="buton">Tambah Header</button>
-              </div>
+              </div> --}}
             </div>
             
             <!-- /.box-header -->
@@ -455,7 +455,13 @@
                     <th>Nilai</th>
                     <th></th>
                   </tr>
-                  
+                  @foreach($jenis_pungutan as $key => $item)
+                    <tr>
+                      <td>{!! Form::text("k_pungutan[]",$item,['class'=>'form-control k-pungutan','readonly'=>true]) !!} {!! Form::hidden("kd_pungutan[]",$key,['class'=>'form-control kd-pungutan','readonly'=>true]) !!}</td>
+                      <td>{!! Form::text("nilai[]",0,['class'=>'form-control nilai','placeholder'=>"Nilai","readonly"=>true]) !!}</td>
+                      <td></td>
+                    </tr>
+                  @endforeach
                
               </table>
             </div>
@@ -535,7 +541,8 @@
           <div class="box box-primary">
               <div class="box-footer">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-primary" id="btn_simpan">Simpan</button>
+                <button type="button" class="btn btn-primary" id="btn_hitung_header">Hitung Nilai Header</button>
+                <button type="submit" class="btn btn-primary" id="btn_simpan" disabled>Simpan</button>
                 <a href="{{ url()->previous() }}"><button type="button" class="btn btn-default">Batal</button></a>
               </div>
           </div>
@@ -584,19 +591,21 @@
             var $detail_pungutan ='<tr>'+
                              '<td><input type="text" value="'+$(e).parent().parent().find('.seri-brg').val()+'" class="form-control seri-brg-detail" name="seri-brg-detail[]" readonly></td>'+
                              '<td><input type="text" value="'+$(e).parent().parent().find('.hs-code').val()+'" class="form-control hs-code-detail" name="hs-code-detail[]" readonly></td>'+
-                             '<td><input type="hidden" name="kd_pungutan_detail[]" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".kd-pungutan").val()+'" class="kd_pungutan_detail"><input type="text" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".kd-pungutan :selected").text()+'" class="form-control" readonly></td>'+
-                             '<td><input type="text" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val()+'" class="form-control" name="nilai_detail[]" readonly></td>'+
+                             '<td><input type="hidden" name="kd_pungutan_detail[]" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".kd-pungutan").val()+'" class="kd_pungutan_detail"><input type="text" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".k-pungutan").val()+'" class="form-control k-pungutan-detail" readonly></td>'+
+                             '<td><input type="text" value="0" class="form-control nilai-detail" name="nilai_detail[]" ></td>'+
                              '<td>{!! Form::text("jenis_tarif_detail[]",old("jenis_tarif_detail"),['class'=>"form-control","placeholder"=>"Jenis Tarif"]) !!}</td>'+
                              '<td>{!! Form::select("kd_tarif_detail[]",$jenis_tarif,null,['class'=>'form-control']) !!}</td>'+
-                             '<td>{!! Form::text("kd_sat_tarif_detail[]",old("kd_sat_tarif_detail"),['class'=>"form-control","placeholder"=>"Kode Satuan Tarif"]) !!}</td>'+
-                             '<td>{!! Form::text("jml_sat_detail[]",old("jml_sat_detail"),['class'=>"form-control","placeholder"=>"Jumlah Satuan"]) !!}</td>'+
+                             '<td>{!! Form::text("kd_sat_tarif_detail[]",1,['class'=>"form-control","placeholder"=>"Kode Satuan Tarif","readonly"=>true]) !!}</td>'+
+                             '<td>{!! Form::text("jml_sat_detail[]",0,['class'=>"form-control","placeholder"=>"Jumlah Satuan","readonly"=>true]) !!}</td>'+
                              '<td> {!! Form::text("tarif_detail[]",old("tarif_detail"),['class'=>"form-control","placeholder"=>"Tarif"]) !!}</td>'+
                              
                             '</tr>';
             $("#detail_pungutan").append($detail_pungutan);
+
         }
   
         $("#detail_pungutan").append(detail_pungutan);
+        $(e).remove();
     }
 
     function hapus_detail_barang(e){
@@ -642,6 +651,50 @@
           radioClass: 'iradio_flat-green'
         });
 
+        $("#btn_hitung_header").click(function(e){
+            e.preventDefault();
+            var count = $("#detail_pungutan tr").length;
+            var BM = 0;
+            var PPH = 0;
+            var PPN = 0;
+            var PPNBM = 0;
+
+            for(var i = 1; i < count ;i++){
+                var tr_start = i+1;
+                var kd_pungutan = $('#detail_pungutan tr:nth-child('+tr_start+')').find(".k-pungutan-detail").val();
+                var nilai_detail = parseFloat($('#detail_pungutan tr:nth-child('+tr_start+')').find(".nilai-detail").val());
+
+                if(kd_pungutan == 'BM'){
+                   BM += nilai_detail;
+                }else if(kd_pungutan == 'PPH'){
+                   PPH += nilai_detail;
+                }else if(kd_pungutan == 'PPN'){
+                   PPN += nilai_detail;
+                }else if(kd_pungutan == 'PPNBM'){
+                   PPNBM += nilai_detail;
+                }
+            }
+
+
+            var count_header = $("#header_pungutan").length;
+            for(var i = 1; i < count ;i++){
+                var tr_start = i+1;
+                var kd_pungutan = $('#header_pungutan tr:nth-child('+tr_start+')').find(".k-pungutan").val();
+                if(kd_pungutan == 'BM'){
+                   $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(BM);
+                }else if(kd_pungutan == 'PPH'){
+                   $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(PPH);
+                }else if(kd_pungutan == 'PPN'){
+                   $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(PPN);
+                }else if(kd_pungutan == 'PPNBM'){
+                   $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(PPNBM);
+                }
+            }
+
+            $("#btn_simpan").prop("disabled",false);
+
+        });
+
         $("select[name='customer_id']").change(function(){
          
             $.get('{{ url("customer/get") }}/'+$(this).val(), function(data) {
@@ -674,7 +727,7 @@
             $("#header_pungutan").append(htmlTr);
         });
 
-        //  
+        //
 
         $("#tambah_barang").click(function(e){
             e.preventDefault();
@@ -869,9 +922,9 @@
                         scrollTop: $("input[name='no_barang']").position().top
                     }, 'slow');
 
-                    window.setTimeout(function() {
-                        window.location.replace('{{ url("cnpibk") }}');
-                    }, 1000);
+                    // window.setTimeout(function() {
+                    //     window.location.replace('{{ url("cnpibk") }}');
+                    // }, 1000);
                }
 
                $("#btn_simpan").text("Simpan");

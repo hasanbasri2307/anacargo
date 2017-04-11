@@ -237,7 +237,7 @@ class CnpibkController extends Controller
     	$data['id'] =$id;
     	$data['cnpibk_header_pungutan'] = HeaderPungutan::where("cnpibk_id",$id)->get();
     	$data['cnpibk_detail_barang'] = DetailBarang::where("cnpibk_id",$id)->get();
-    	$detail_pungutan = DB::select("select *, detail_pungutan.id as idnya from detail_pungutan inner join detail_barang on detail_barang.id = detail_pungutan.detail_barang_id where detail_barang.cnpibk_id = ?",[$id]);
+    	$detail_pungutan = DB::select("select *, detail_pungutan.id as idnya from detail_pungutan inner join detail_barang on detail_barang.id = detail_pungutan.detail_barang_id inner join jenis_pungutan on jenis_pungutan.id = detail_pungutan.kd_pungutan where detail_barang.cnpibk_id = ?",[$id]);
     	$data['cnpibk_detail_pungutan'] = $detail_pungutan;
 
     	$data['cnpibk'] = Cnpibk::find($id);
@@ -358,8 +358,6 @@ class CnpibkController extends Controller
                 $cnpibk->npwp_billing = $request->input("npwp_billing");
                 $cnpibk->nama_billing = $request->input("nama_billing");
                 $cnpibk->status =0;
-                $cnpibk->tipe_dokumen = "cn";
-                $cnpibk->status_code_id = 37;
                 $cnpibk->save();
 
              
