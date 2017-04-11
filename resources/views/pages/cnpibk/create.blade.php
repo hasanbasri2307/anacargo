@@ -922,9 +922,9 @@
                         scrollTop: $("input[name='no_barang']").position().top
                     }, 'slow');
 
-                    // window.setTimeout(function() {
-                    //     window.location.replace('{{ url("cnpibk") }}');
-                    // }, 1000);
+                    window.setTimeout(function() {
+                        window.location.replace('{{ url("cnpibk") }}');
+                    }, 1000);
                }
 
                $("#btn_simpan").text("Simpan");
