@@ -15,9 +15,10 @@ Route::get('/', "Auth\LoginController@showLoginForm");
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index');
+
 
 Route::group(['middleware'=>'auth'],function(){
+	Route::get('/home', 'HomeController@index');
 	//client
 	Route::get("customers","CustomerController@index");
 	Route::get("customer/create","CustomerController@create");
@@ -58,6 +59,17 @@ Route::group(['middleware'=>'auth'],function(){
 	Route::get("cnpibk/tracking/{id}",'CnpibkController@tracking');
 	Route::post("cnpibk/cekstatus",'CnpibkController@cekStatus');
 	Route::get("cnpibk/getallresponse",'CnpibkController@getAllResponse');
+	Route::post("cnpibk/search","CnpibkController@search");
+	Route::get("cnpibk/pdf/{id}","CnpibkController@pdf");
+	Route::get("cnpibk/lartas/{id}","CnpibkController@lartas");
+	
+	Route::get("cnpibk/download/pdf/{filename}",function($filename){
+		return response()->download(public_path().'/assets/pdf/'.$filename);
+	});
+
+	Route::get("cnpibk/download/xml/{filename}",function($filename){
+		return response()->download(public_path().'/assets/xml/'.$filename);
+	});
 
 	//customer
 	Route::get("customer/get/{id}",'CustomerController@getById');
@@ -68,3 +80,5 @@ Route::group(['middleware'=>'auth'],function(){
 	//
 	Route::post("sendpibk","CnpibkController@sendPiBk");
 });
+
+Route::get("testing","CnpibkController@testing");

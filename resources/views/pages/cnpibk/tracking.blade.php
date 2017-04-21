@@ -158,6 +158,7 @@
           $(this).prop("disabled",true);
           $(this).text("Sedang Proses");
 
+
           $.post('{{ url("cnpibk/cekstatus") }}', {no_barang: '{{ $cnpibk->no_barang }}',tgl_house_blawb:'{{ $cnpibk->tgl_house_blawb }}',_token:"{{ csrf_token() }}",id:'{{ $cnpibk->id }}'}, function(data, textStatus, xhr) {
              if(data.status ===true){
                   $("#notif").html('<div class="alert alert-success"><strong>Sukses!</strong> Data berhasil dikirim ke Bea Cukai.</div>');
@@ -170,17 +171,19 @@
                         window.location.reload();
                     }, 1000);
               }else{
-                  $("#notif").html('<div class="alert alert-error"><strong>Erro!</strong> Ada Kesalahan, silahkan coba lagi nanti.</div>');
+                  $("#notif").html('<div class="alert alert-error"><strong>Erro!</strong> '+data.response[0]+'</div>');
                   $('html, body')
                     .animate({
                         scrollTop: $("#notif").position().top
                     }, 'slow');
-
-                    window.setTimeout(function() {
+                    
+                  window.setTimeout(function() {
                         window.location.reload();
                     }, 1000);
               }
           });
+
+         
       });
   });
 </script>

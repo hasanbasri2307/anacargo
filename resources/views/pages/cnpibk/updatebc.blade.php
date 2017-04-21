@@ -182,6 +182,13 @@
                           .animate({
                               scrollTop: $("#form-update-bc").position().top
                           }, 'slow');
+                  }else if(data.response){
+                      $("#notif").html('<div class="alert alert-danger"><strong>Error!</strong> '+data.response+'</div>');
+
+                     $('html, body')
+                          .animate({
+                              scrollTop: $("#form-update-bc").position().top
+                          }, 'slow');
                   }
                }else{
                   $("#notif").html('<div class="alert alert-success"><strong>Sukses!</strong> Data BC 1.1 Berhasil Diupdate.</div>');

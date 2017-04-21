@@ -12,6 +12,18 @@
         .title-action {
             margin-left: 10px;
         }
+        .search {
+          margin-left: 400px;
+          margin-top: 30px;
+        }
+
+        .search .form-control {
+          width: 250px;
+        }
+
+        .search .btn-default{
+          width: 80px;
+        }
         
     </style>
 @endsection
@@ -65,7 +77,30 @@
                   </div>
                   
                </div>
-             
+               <div class="search">
+                  <form class="form-inline" method="POST" action="{{ url('cnpibk/search') }}">
+                    <div class="form-group">
+                      <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                      <select class="form-control" id="filter_by" name="filter_by" >
+                        <option disabled selected>Pilih</option>
+                        <option value="no_barang" {{ Session::get("filter_by") == "no_barang" ? "selected" :"" }}>No Barang</option>
+                        <option value="jenis_aju" {{ Session::get("filter_by") == "jenis_aju" ? "selected" :"" }}>Jenis AJU</option>
+                      </select>
+                    </div>
+                    <div class="form-group" id="no_barang" {{ Session::has("no_barang") ? "" : "style=display:none;" }}>
+                      <input type="text" class="form-control" value="{{ Session::has("no_barang") ? Session::get("no_barang") :"" }}" name="no_barang" placeholder="Nomor Barang">
+                    </div>
+
+                    <div class="form-group" id="jenis_aju" {{ Session::has("jenis_aju") ? "" :"style=display:none;" }}>
+                      <select class="form-control" name="jenis_aju" >
+                        <option value="cn" {{ Session::get("jenis_aju") == "cn" ? "selected" :"" }}>CN</option>
+                        <option value="pibk" {{ Session::get("jenis_aju") == "pibk" ? "selected" :"" }}>PIBK</option>
+                      </select>
+                    </div>
+                    <button type="submit" class="btn btn-default">Cari</button>
+                  </form>
+               </div>
+               
             </div>
             <!-- /.box-body -->
           </div>
@@ -120,6 +155,9 @@
                                   </button>
                                   <ul class="dropdown-menu" role="menu">
                                     <li><a href="#" class="lihat-detail" data-id="{{ $item->id }}">Lihat Detail</a></li>
+                                    <li><a href="#" class="lihat-pdf" data-id="{{ $item->id }}">PDF</a></li>
+                                    <li><a href="#" class="lihat-lartas" data-id="{{ $item->id }}">LARTAS</a></li>
+                                    <li><a href="{{ url("cnpibk/download/xml/".$item->id.'-'.$item->no_barang.'.txt') }}" target="_blank"">XML</a></li>
                                     <li><a href="{{ url("cnpibk/edit/".$item->id) }}">Ubah</a></li>
                                     <li><a href="{{ url("cnpibk/editbc11/".$item->id) }}">Update BC 1.1</a></li>
                                     <li><a href="{{ url("cnpibk/tracking/".$item->id) }}">Tracking</a></li>
@@ -148,6 +186,48 @@
                       </div>
                       <div class="modal-body">
                         <div id="cnpibk">
+                        </div>
+                        
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Tutup</button>
+                      </div>
+                    </div>
+                    <!-- /.modal-content -->
+                  </div>
+                  <!-- /.modal-dialog -->
+                </div>
+                <div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Lampiran PDF CNPIBK</h4>
+                      </div>
+                      <div class="modal-body">
+                        <div id="cnpibkpdf">
+                        </div>
+                        
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Tutup</button>
+                      </div>
+                    </div>
+                    <!-- /.modal-content -->
+                  </div>
+                  <!-- /.modal-dialog -->
+                </div>
+                <div class="modal fade" id="lartasModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">LARTAS CNPIBK</h4>
+                      </div>
+                      <div class="modal-body">
+                        <div id="cnpibklartas">
                         </div>
                         
                       </div>
@@ -227,6 +307,28 @@
           });
       });
 
+      $(".lihat-pdf").click(function(){
+          var cnpibk_id = $(this).attr("data-id");
+          $.get('{{ url("cnpibk/pdf/") }}/'+cnpibk_id, function(data) {
+              if(data.status){
+
+                    $("#cnpibkpdf").html(data.html);
+                    $("#pdfModal").modal("show");
+              }
+          });
+      });
+
+      $(".lihat-lartas").click(function(){
+          var cnpibk_id = $(this).attr("data-id");
+          $.get('{{ url("cnpibk/lartas/") }}/'+cnpibk_id, function(data) {
+              if(data.status){
+
+                    $("#cnpibklartas").html(data.html);
+                    $("#lartasModal").modal("show");
+              }
+          });
+      });
+
       $('#ambil-semua-respon').click(function(e){
           e.preventDefault();
 
@@ -258,6 +360,17 @@
               }
 
           });
+      });
+
+      $("#filter_by").change(function(event) {
+        /* Act on the event */
+        if($(this).val() == "no_barang"){
+           $("#no_barang").show();
+           $("#jenis_aju").hide();
+        }else{
+          $("#no_barang").hide();
+           $("#jenis_aju").show();
+        }
       });
   });
 </script>

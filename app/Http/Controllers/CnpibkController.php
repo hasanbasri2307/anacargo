@@ -16,17 +16,24 @@ use App\JenisPungutan;
 use App\JenisTarif;
 use App\StatusCode;
 use App\StatusHistory;
+use App\DetailLartas;
+use App\CnpibkPdf;
 use App\Http\Requests\CnRequest;
 use Validator;
 use DB;
 use Config;
+use Session;
 
 class CnpibkController extends Controller
 {
     //
     public function index(){
+        Session::forget("filter_by");
+        Session::forget("no_barang");
+        Session::forget("jenis_aju");
+
     	$data['title'] = "CN";
-    	$data['cn'] = Cnpibk::where("tipe_dokumen","cn")->paginate(10);
+    	$data['cn'] = Cnpibk::paginate(10);
 
     	return view("pages.cnpibk.index",$data);
     }
@@ -596,13 +603,16 @@ class CnpibkController extends Controller
 
 			}
 
+            $x = fopen(public_path().'/assets/xml/'.$id.'-'.$this->clean($cnpibk->no_barang).'.txt', 'w');
+            fwrite($x, $cnpibk_xml->asXml());
+
 			$webServiceClient = new \SoapClient($wsdlAddress, $setting); 
 
 			try{
 				$requestData = array(
 					"data"=>$cnpibk_xml->asXml(),
-					"id" => "trijoko1945"."^$"."sbejkt@1946",
-					"sign" => "TURNek5EWTJNekF4TFRFMw0K"  
+					"id" => Config::get("sayapbiru.id"),
+					"sign" => Config::get("sayapbiru.token")  
 				);
 				$response = $webServiceClient->__soapCall("kirimData", array("kirimData" => $requestData));
 						$respon_string= simplexml_load_string($response->return);
@@ -641,7 +651,9 @@ class CnpibkController extends Controller
 				}
 				catch (SoapFault $exception) {
 						return response()->json(['status'=>false,'response'=>$exception]);    
-			} 
+			}
+
+            
     	}
     	
     }
@@ -743,12 +755,16 @@ class CnpibkController extends Controller
 			try{
 				$requestData = array(
 					"data"=>$update_bc11_xml->asXml(),
-					"id" => "trijoko1945"."^$"."sbejkt@1946",
-					"sign" => "TURNek5EWTJNekF4TFRFMw0K"  
+					"id" => Config::get("sayapbiru.id"),
+                    "sign" => Config::get("sayapbiru.token")  
 				);
 
 				$response = $webServiceClient->__soapCall("updateBc11", array("updateBc11" => $requestData));
 				$respon_string= simplexml_load_string($response->return);
+
+                if($respon_string->HEADER->KD_RESPON == "ERR"){
+                    return response()->json(['status'=>false,'response'=>$respon_string->HEADER->KET_RESPON]);
+                }
 
 				DB::transaction(function () use($respon_string,$id) {
 					//set latest status code
@@ -817,13 +833,16 @@ class CnpibkController extends Controller
 		try{
 			$requestData = array(
 				"data"=>$cek_status->asXml(),
-				"id" => "trijoko1945"."^$"."sbejkt@1946",
-				"sign" => "TURNek5EWTJNekF4TFRFMw0K"  
+				"id" => Config::get("sayapbiru.id"),
+                "sign" => Config::get("sayapbiru.token") 
 			);
 
 			$response = $webServiceClient->__soapCall("getResponByAwb", array("getResponByAwb" => $requestData));
 			$respon_string= simplexml_load_string($response->return);
 			
+            if($respon_string->HEADER->KD_RESPON == "ERR"){
+                return response()->json(['status'=>false,"response"=>$respon_string->HEADER->KET_RESPON]);
+            }
 
 			DB::transaction(function () use($respon_string,$id) {
 				//set latest status code
@@ -848,6 +867,32 @@ class CnpibkController extends Controller
 					$update_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($respon_string->HEADER->WK_REKAM));
 					$update_status_history->save();
 				}
+
+                if($status_code == 304 || $status_code == 306){
+                    foreach($respon_string->HEADER->DETIL_LARTAS as $item) {
+                        $detail_lartas = new DetailLartas();
+                        $detail_lartas->cnpibk_id = $id;
+                        $detail_lartas->seri_brg = $item->SERI_BRG;
+                        $detail_lartas->ur_brg = $item->UR_BRG;
+                        $detail_lartas->ket_lartas = $item->KET_LARTAS;
+                        $detail_lartas->save();
+                    }
+                }
+
+                if($status_code == 303 || $status_code == 404 || $status_code == 403 || $status_code == 401 || $status_code == 402 || $status_code == 304 || $status_code == 306){                  
+                    $pdf_decoded = base64_decode($respon_string->HEADER->PDF);
+                    $pdf = fopen(public_path("assets/pdf/".$id.'-'.$respon_string->HEADER->KD_RESPON.'-'.$respon_string->HEADER->NO_BARANG.'.pdf'),'w');
+                    fwrite ($pdf,$pdf_decoded);
+
+                    $check = CnpibkPdf::where(['cnpibk_id'=>$id,'status_code' => $status_code])->count();
+                    if($check == 0){
+                        $cnpibk_pdf = new CnpibkPdf();
+                        $cnpibk_pdf->cnpibk_id = $id;
+                        $cnpibk_pdf->status_code = $status_code;
+                        $cnpibk_pdf->pdf = $id.'-'.$respon_string->HEADER->KD_RESPON.'-'.$respon_string->HEADER->NO_BARANG.'.pdf';
+                        $cnpibk_pdf->save();
+                    }
+                }
 			},2);
 
 			return response()->json(['status'=>true,'data'=>$respon_string]);
@@ -874,8 +919,8 @@ class CnpibkController extends Controller
 		try{
 			$requestData = array(
 				"npwp"=>Config::get("sayapbiru.no_id_pemberitahu"),
-				"id" => "trijoko1945"."^$"."sbejkt@1946",
-				"sign" => "TURNek5EWTJNekF4TFRFMw0K"  
+				"id" => Config::get("sayapbiru.id"),
+                "sign" => Config::get("sayapbiru.token")    
 			);
 
 			$response = $webServiceClient->__soapCall("requestRespon", array("requestRespon" => $requestData));
@@ -889,25 +934,51 @@ class CnpibkController extends Controller
 					foreach($arr->HEADER as $object){
 						$status_code = $object->KD_RESPON;
 						$status_code_model = StatusCode::where("kode",$status_code)->first();
-						$cnpibk_update = Cnpibk::find($id);
+						$cnpibk_update = Cnpibk::where(['no_barang'=>$object->NO_BARANG,'tgl_house_blawb'=>str_replace("/","-",$object->TGL_HOUSE_BLAWB)])->first();
 						$cnpibk_update->status_code_id = $status_code_model->id;
 						$cnpibk_update->save();
 
-						$status_history_model = StatusHistory::where(['status_code_id'=>$status_code_model->id,'cnpibk_id'=>$id])->count();
+						$status_history_model = StatusHistory::where(['status_code_id'=>$status_code_model->id,'cnpibk_id'=>$cnpibk_update->id])->count();
 						if($status_history_model == 0){
 							$new_status_history = new StatusHistory();
 							$new_status_history->status_code_id = $status_code_model->id;
-							$new_status_history->cnpibk_id = $id;
+							$new_status_history->cnpibk_id = $cnpibk_update->id;
 							$new_status_history->ket_respon = $object->KET_RESPON;
 							$new_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($object->WK_REKAM));
 							$new_status_history->save();
 						}else{
-							$update_status_history = StatusHistory::where(['cnpibk_id'=>$id,'status_code_id'=>$status_code_model->id])->first();
+							$update_status_history = StatusHistory::where(['cnpibk_id'=>$cnpibk_update->id,'status_code_id'=>$status_code_model->id])->first();
 							$update_status_history->status_code_id = $status_code_model->id;
 							$update_status_history->ket_respon = $object->KET_RESPON;
 							$update_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($object->WK_REKAM));
 							$update_status_history->save();
 						}
+
+                        if($status_code == 304 || $status_code == 306){
+                            foreach($respon_string->HEADER->DETIL_LARTAS as $item) {
+                                $detail_lartas = new DetailLartas();
+                                $detail_lartas->cnpibk_id = $cnpibk_update->id;
+                                $detail_lartas->seri_brg = $item->SERI_BRG;
+                                $detail_lartas->ur_brg = $item->UR_BRG;
+                                $detail_lartas->ket_lartas = $item->KET_LARTAS;
+                                $detail_lartas->save();
+                            }
+                        }
+
+                        if($status_code == 303 || $status_code == 404 || $status_code == 403 || $status_code == 401 || $status_code == 402 || $status_code == 304 || $status_code == 306){
+                            $pdf_decoded = base64_decode($object->PDF);
+                            $pdf = fopen(public_path("assets/pdf/".$cnpibk_update->id.'-'.$object->KD_RESPON.'-'.$object->NO_BARANG.'.pdf'),'w');
+                            fwrite ($pdf,$pdf_decoded);
+
+                            $check = CnpibkPdf::where(['cnpibk_id'=>$cnpibk_update->id,'status_code' => $status_code])->count();
+                            if($check == 0){
+                                $cnpibk_pdf = new CnpibkPdf();
+                                $cnpibk_pdf->cnpibk_id = $cnpibk_update->id;
+                                $cnpibk_pdf->status_code = $status_code;
+                                $cnpibk_pdf->pdf = $cnpibk_update->id.'-'.$respon_string->HEADER->KD_RESPON.'-'.$respon_string->HEADER->NO_BARANG.'.pdf';
+                                $cnpibk_pdf->save();
+                            }
+                        }
 					}
 					
 				},2);
@@ -918,6 +989,53 @@ class CnpibkController extends Controller
 		catch (SoapFault $exception) {
 			return response()->json(['status'=>false,'response'=>$exception]);    
 		} 
+    }
+
+    public function search(Request $request){
+        Session::forget("filter_by");
+        Session::forget("no_barang");
+        Session::forget("jenis_aju");
+
+        if($request->has("filter_by")){
+            $filter_by = $request->input("filter_by");
+            Session::put("filter_by",$filter_by);
+
+            if($filter_by == "no_barang"){
+                $no_barang = $request->input("no_barang");
+                Session::put("no_barang",$no_barang);
+                $cn = Cnpibk::where("no_barang",$no_barang)->paginate(10);
+            }else{
+                if($request->input("jenis_aju") == "cn"){
+                    $cn = Cnpibk::where("jns_aju",5)->paginate(10);
+                }else{
+                    $cn = Cnpibk::where("jns_aju",6)->paginate(10);
+                }
+
+                Session::put("jenis_aju",$request->input("jenis_aju"));
+            }
+        }else{
+            $cn = Cnpibk::paginate(10);
+        }
+
+        $data['title'] = "search";
+        $data['cn'] = $cn;
+        return view("pages.cnpibk.index",$data);
+    }
+
+    public function pdf($id){
+        $data['status'] = true;
+        $pdf = CnpibkPdf::where("cnpibk_id",$id)->get();
+        $data['html'] = view('pages.cnpibk.pdf')->with("pdf",$pdf)->render();
+
+        return response()->json($data);
+    }
+
+    public function lartas($id){
+        $data['status'] = true;
+        $lartas = DetailLartas::where("cnpibk_id",$id)->get();
+        $data['html'] = view('pages.cnpibk.lartas')->with("lartas",$lartas)->render();
+
+        return response()->json($data);
     }
 
     private function clean($str){
