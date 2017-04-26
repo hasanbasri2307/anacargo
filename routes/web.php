@@ -62,7 +62,8 @@ Route::group(['middleware'=>'auth'],function(){
 	Route::post("cnpibk/search","CnpibkController@search");
 	Route::get("cnpibk/pdf/{id}","CnpibkController@pdf");
 	Route::get("cnpibk/lartas/{id}","CnpibkController@lartas");
-	
+	Route::delete("cnpibk/delete/{id}","CnpibkController@delete");
+
 	Route::get("cnpibk/download/pdf/{filename}",function($filename){
 		return response()->download(public_path().'/assets/pdf/'.$filename);
 	});

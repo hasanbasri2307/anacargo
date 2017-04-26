@@ -188,19 +188,19 @@
                 </div>
                 <div class="form-group has-feedback">
                   <label for="exampleInputEmail1">FOB</label>
-                  {!! Form::text("fob",old("fob"),['class'=>"form-control","placeholder"=>"FOB"]) !!}
+                  {!! Form::text("fob",old("fob"),['class'=>"form-control","placeholder"=>"FOB",'onchange'=>'hitungCif(this)']) !!}
                   
                    <span class="help-block"></span>
                 </div>
                 <div class="form-group has-feedback">
                   <label for="exampleInputEmail1">Asuransi</label>
-                  {!! Form::text("asuransi",old("fob"),['class'=>"form-control","placeholder"=>"Asuransi"]) !!}
+                  {!! Form::text("asuransi",old("fob"),['class'=>"form-control","placeholder"=>"Asuransi",'onchange'=>'hitungCif(this)']) !!}
                   
                    <span class="help-block"></span>
                 </div>
                 <div class="form-group has-feedback">
                   <label for="exampleInputEmail1">Freight</label>
-                  {!! Form::text("freight",old("freight"),['class'=>"form-control","placeholder"=>"Freight"]) !!}
+                  {!! Form::text("freight",old("freight"),['class'=>"form-control","placeholder"=>"Freight",'onchange'=>'hitungCif(this)']) !!}
                   
                    <span class="help-block"></span>
                 </div>
@@ -273,7 +273,7 @@
              <div class="box-body">
                 <div class="form-group">
                   <label>Kode PIBK</label>
-                  {!! Form::select("kd_jns_pibk",$jenis_pibk,null,['class'=>'form-control select2']) !!}
+                  {!! Form::select("kd_jns_pibk",$jenis_pibk,8,['class'=>'form-control select2']) !!}
                 </div>
                
                 
@@ -593,7 +593,7 @@
                              '<td><input type="text" value="'+$(e).parent().parent().find('.hs-code').val()+'" class="form-control hs-code-detail" name="hs-code-detail[]" readonly></td>'+
                              '<td><input type="hidden" name="kd_pungutan_detail[]" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".kd-pungutan").val()+'" class="kd_pungutan_detail"><input type="text" value="'+$('#header_pungutan tr:nth-child('+tr_start+')').find(".k-pungutan").val()+'" class="form-control k-pungutan-detail" readonly></td>'+
                              '<td><input type="text" value="0" class="form-control nilai-detail" name="nilai_detail[]" ></td>'+
-                             '<td>{!! Form::text("jenis_tarif_detail[]",old("jenis_tarif_detail"),['class'=>"form-control","placeholder"=>"Jenis Tarif"]) !!}</td>'+
+                             '<td>{!! Form::text("jenis_tarif_detail[]",1,['class'=>"form-control","placeholder"=>"Jenis Tarif"]) !!}</td>'+
                              '<td>{!! Form::select("kd_tarif_detail[]",$jenis_tarif,null,['class'=>'form-control']) !!}</td>'+
                              '<td>{!! Form::text("kd_sat_tarif_detail[]",1,['class'=>"form-control","placeholder"=>"Kode Satuan Tarif","readonly"=>true]) !!}</td>'+
                              '<td>{!! Form::text("jml_sat_detail[]",0,['class'=>"form-control","placeholder"=>"Jumlah Satuan","readonly"=>true]) !!}</td>'+
@@ -639,7 +639,36 @@
         } 
     }
 
+    function hitungCif(e){
+       $cif = $("input[name='cif']");
+       var total=0;
+       if($(e).attr("name") == "fob"){
+         var fob = $(e).val() == "" ? 0 : parseFloat($(e).val());
+         var freight = $('input[name="freight"]').val() == "" ? 0 : parseFloat($('input[name="freight"]').val());
+         var asuransi = $("input[name='asuransi']").val() == "" ? 0 : parseFloat($("input[name='asuransi']").val());
+
+         total = fob + freight + asuransi; 
+         $cif.val(total);
+       }else if($(e).attr("name") == "asuransi"){
+         var asuransi = $(e).val() == "" ? 0 : parseFloat($(e).val());
+         var freight = $('input[name="freight"]').val() == "" ? 0 : parseFloat($('input[name="freight"]').val());
+         var fob = $("input[name='fob']").val() == "" ? 0 : parseFloat($("input[name='fob']").val());
+
+         total = fob + freight + asuransi; 
+         $cif.val(total);
+       }else if($(e).attr("name") == "freight"){
+         var freight = $(e).val() == "" ? 0 : parseFloat($(e).val());
+         var asuransi = $('input[name="asuransi"]').val() == "" ? 0 : parseFloat($('input[name="asuransi"]').val());
+         var fob = $("input[name='fob']").val() == "" ? 0 : parseFloat($("input[name='fob']").val());
+         
+         total = fob + freight + asuransi; 
+         $cif.val(total);
+       }
+    }
+
     $(document).ready(function() {
+
+        $("input[name='asuransi'")
         $(".select2").select2();
 
         $('.datepicker').datepicker({
@@ -690,6 +719,8 @@
                    $('#header_pungutan tr:nth-child('+tr_start+')').find(".nilai").val(PPNBM);
                 }
             }
+
+            $("input[name='tot_dibayar'").val(BM + PPH +PPN + PPNBM);
 
             $("#btn_simpan").prop("disabled",false);
 

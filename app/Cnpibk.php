@@ -3,11 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Cnpibk extends Model
 {
     //
+    use SoftDeletes;
     protected $table = "cnpibk";
+    protected $dates = ['deleted_at'];
 
     public function aju(){
     	return $this->belongsTo(JenisAju::class,'jns_aju');

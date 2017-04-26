@@ -616,6 +616,11 @@ class CnpibkController extends Controller
 				);
 				$response = $webServiceClient->__soapCall("kirimData", array("kirimData" => $requestData));
 						$respon_string= simplexml_load_string($response->return);
+
+                        if($respon_string == NULL){
+                            return response()->json(['status'=>false,'response'=>["Ada kesalahan dari Bea Cukai, silahkan coba lagi nanti."]]);
+                        }
+
                         $status_code = $respon_string->HEADER->KD_RESPON;
 
                         if($status_code == "ERR"){
@@ -762,6 +767,10 @@ class CnpibkController extends Controller
 				$response = $webServiceClient->__soapCall("updateBc11", array("updateBc11" => $requestData));
 				$respon_string= simplexml_load_string($response->return);
 
+                if($respon_string == NULL){
+                    return response()->json(['status'=>false,'response'=>["Ada kesalahan dari Bea Cukai, silahkan coba lagi nanti."]]);
+                }
+
                 if($respon_string->HEADER->KD_RESPON == "ERR"){
                     return response()->json(['status'=>false,'response'=>$respon_string->HEADER->KET_RESPON]);
                 }
@@ -839,9 +848,13 @@ class CnpibkController extends Controller
 
 			$response = $webServiceClient->__soapCall("getResponByAwb", array("getResponByAwb" => $requestData));
 			$respon_string= simplexml_load_string($response->return);
+
+            if($respon_string == NULL){
+                return response()->json(['status'=>false,'response'=>["Ada kesalahan dari Bea Cukai, silahkan coba lagi nanti."]]);
+            }
 			
-            if($respon_string->HEADER->KD_RESPON == "ERR"){
-                return response()->json(['status'=>false,"response"=>$respon_string->HEADER->KET_RESPON]);
+            if($respon_string->KD_RESPON == "ERR"){
+                return response()->json(['status'=>false,"response"=>$respon_string->KET_RESPON]);
             }
 
 			DB::transaction(function () use($respon_string,$id) {
@@ -924,17 +937,18 @@ class CnpibkController extends Controller
 			);
 
 			$response = $webServiceClient->__soapCall("requestRespon", array("requestRespon" => $requestData));
-			$respon_string= simplexml_load_string($response->return);
-			$xmlObject ="<RESPONSE>".str_replace("</RESPONSE>","", str_replace("<RESPONSE>","",$respon_string))."</RESPONSE>";
-			$arr = simplexml_load_string($xmlObject);
+            $ins = "<CNPIBK>";
+			// $respon_string= simplexml_load_string($response->return);
+			$newRes = $ins.$response->return."</CNPIBK>";
+			$arr = simplexml_load_string($newRes);
 
 			if(!empty($arr)){
-				DB::transaction(function () use($arr,$id) {
+				DB::transaction(function () use($arr) {
 					//set latest status code
-					foreach($arr->HEADER as $object){
-						$status_code = $object->KD_RESPON;
+					foreach($arr->RESPONSE as $object){
+						$status_code = $object->HEADER->KD_RESPON;
 						$status_code_model = StatusCode::where("kode",$status_code)->first();
-						$cnpibk_update = Cnpibk::where(['no_barang'=>$object->NO_BARANG,'tgl_house_blawb'=>str_replace("/","-",$object->TGL_HOUSE_BLAWB)])->first();
+						$cnpibk_update = Cnpibk::where(['no_barang'=>$object->HEADER->NO_BARANG,'tgl_house_blawb'=>str_replace("/","-",$object->HEADER->TGL_HOUSE_BLAWB)])->first();
 						$cnpibk_update->status_code_id = $status_code_model->id;
 						$cnpibk_update->save();
 
@@ -943,19 +957,19 @@ class CnpibkController extends Controller
 							$new_status_history = new StatusHistory();
 							$new_status_history->status_code_id = $status_code_model->id;
 							$new_status_history->cnpibk_id = $cnpibk_update->id;
-							$new_status_history->ket_respon = $object->KET_RESPON;
-							$new_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($object->WK_REKAM));
+							$new_status_history->ket_respon = $object->HEADER->KET_RESPON;
+							$new_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($object->HEADER->WK_REKAM));
 							$new_status_history->save();
 						}else{
 							$update_status_history = StatusHistory::where(['cnpibk_id'=>$cnpibk_update->id,'status_code_id'=>$status_code_model->id])->first();
 							$update_status_history->status_code_id = $status_code_model->id;
-							$update_status_history->ket_respon = $object->KET_RESPON;
-							$update_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($object->WK_REKAM));
+							$update_status_history->ket_respon = $object->HEADER->KET_RESPON;
+							$update_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($object->HEADER->WK_REKAM));
 							$update_status_history->save();
 						}
 
                         if($status_code == 304 || $status_code == 306){
-                            foreach($respon_string->HEADER->DETIL_LARTAS as $item) {
+                            foreach($object->HEADER->DETIL_LARTAS as $item) {
                                 $detail_lartas = new DetailLartas();
                                 $detail_lartas->cnpibk_id = $cnpibk_update->id;
                                 $detail_lartas->seri_brg = $item->SERI_BRG;
@@ -966,8 +980,8 @@ class CnpibkController extends Controller
                         }
 
                         if($status_code == 303 || $status_code == 404 || $status_code == 403 || $status_code == 401 || $status_code == 402 || $status_code == 304 || $status_code == 306){
-                            $pdf_decoded = base64_decode($object->PDF);
-                            $pdf = fopen(public_path("assets/pdf/".$cnpibk_update->id.'-'.$object->KD_RESPON.'-'.$object->NO_BARANG.'.pdf'),'w');
+                            $pdf_decoded = base64_decode($object->HEADER->PDF);
+                            $pdf = fopen(public_path("assets/pdf/".$cnpibk_update->id.'-'.$object->HEADER->KD_RESPON.'-'.$object->HEADER->NO_BARANG.'.pdf'),'w');
                             fwrite ($pdf,$pdf_decoded);
 
                             $check = CnpibkPdf::where(['cnpibk_id'=>$cnpibk_update->id,'status_code' => $status_code])->count();
@@ -975,7 +989,7 @@ class CnpibkController extends Controller
                                 $cnpibk_pdf = new CnpibkPdf();
                                 $cnpibk_pdf->cnpibk_id = $cnpibk_update->id;
                                 $cnpibk_pdf->status_code = $status_code;
-                                $cnpibk_pdf->pdf = $cnpibk_update->id.'-'.$respon_string->HEADER->KD_RESPON.'-'.$respon_string->HEADER->NO_BARANG.'.pdf';
+                                $cnpibk_pdf->pdf = $cnpibk_update->id.'-'.$object->HEADER->KD_RESPON.'-'.$object->HEADER->NO_BARANG.'.pdf';
                                 $cnpibk_pdf->save();
                             }
                         }
@@ -1036,6 +1050,14 @@ class CnpibkController extends Controller
         $data['html'] = view('pages.cnpibk.lartas')->with("lartas",$lartas)->render();
 
         return response()->json($data);
+    }
+
+    public function delete($id){
+        $cnpibk = Cnpibk::find($id);
+        $cnpibk->deleted_at = date("Y-m-d H:i:s");
+        $cnpibk->save();
+
+        return redirect("cnpibk")->with("success","Data berhasil dihapus");
     }
 
     private function clean($str){

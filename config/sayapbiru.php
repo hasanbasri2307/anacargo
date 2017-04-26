@@ -10,6 +10,6 @@ return [
 	"tgl_izin_pemberitahu" => "2016/07/12",
 	"kd_kantor" => "050100",
 	"kd_jenis_angkut" => "4",
-	"id" => "trijoko1945"."^$"."sbejkt@1946",
+	"id" => "trijoko1945"."^$"."sbejkt@1945",
 	"token" => "TURNek5EWTJNekF4TFRFMw0K"
 ];
