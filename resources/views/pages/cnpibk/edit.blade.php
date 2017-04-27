@@ -357,7 +357,7 @@
                   <select name="customer_id" class="form-control select2">
                       <option disabled selected value> -- Pilih -- </option>
                       @foreach($customer as $key => $item)
-                        <option value="{{ $key }}" {{ ($cnpibk->custome_id = $key ? 'selected' : '') }}>{{ $item }}</option>
+                        <option value="{{ $key }}" {{ ($cnpibk->customer_id == $key ? 'selected' : '') }}>{{ $item }}</option>
                       @endforeach
                   </select> 
                   
@@ -646,7 +646,7 @@
                              '<td>{!! Form::select("kd_tarif_detail[]",$jenis_tarif,null,['class'=>'form-control']) !!}</td>'+
                              '<td>{!! Form::text("kd_sat_tarif_detail[]",1,['class'=>"form-control","placeholder"=>"Kode Satuan Tarif","readonly"=>true]) !!}</td>'+
                              '<td>{!! Form::text("jml_sat_detail[]",0,['class'=>"form-control","placeholder"=>"Jumlah Satuan","readonly"=>true]) !!}</td>'+
-                             '<td> {!! Form::text("tarif_detail[]",old("tarif_detail"),['class'=>"form-control","placeholder"=>"Tarif"]) !!}</td>'+
+                             '<td> {!! Form::text("tarif_detail[]",0,['class'=>"form-control","placeholder"=>"Tarif"]) !!}</td>'+
                              
                             '</tr>';
             $("#detail_pungutan").append($detail_pungutan);

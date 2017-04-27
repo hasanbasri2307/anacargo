@@ -106,7 +106,7 @@
 </binding>
 <service name="WSBarangKiriman">
 <port name="WSBarangKirimanPort" binding="tns:WSBarangKirimanPortBinding">
-<soap:address location="https://esbbcext01.beacukai.go.id:9082/BarangKirimanPublic/WSBarangKiriman"/>
+<soap:address location="https://esbbcext01.beacukai.go.id:9082/BarangKirimanOnline/WSBarangKiriman"/>
 </port>
 </service>
 </definitions>
