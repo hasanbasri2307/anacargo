@@ -15,7 +15,7 @@
 <body>
 	<table class="table table-bordered">
 		<tr>
-			<th colspan="4"><h3 align="center">PT SAYAP BIRU EKSPRESS</h3></th>
+			<th colspan="4"><h3 align="center">{{ Config::get("sayapbiru.company_name") }}</h3></th>
 		</tr>
 		<tr>
 			<th colspan="4">INFORMASI CN-PIBK</th>

@@ -1,7 +1,7 @@
 <?php
 
 return [
-	"company_name" => "Sayap Biru (ANACARGO)",
+	"company_name" => "PT Sayap Biru Ekspress",
 	"jenis_id_pemberitahu" => "5",
 	"no_id_pemberitahu" => "033466301077000",
 	"nm_pemberitahu" => "PT.Sayap Biru Ekspres",
