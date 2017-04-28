@@ -19,7 +19,7 @@
             </div>
             <!-- /.box-header -->
             <!-- form start -->
-            {!! Form::model($client,['url'=>'custmer/update/'.$client->id]) !!}
+            {!! Form::model($client,['url'=>'customer/update/'.$client->id]) !!}
             
              <div class="box-body">
                 <div class="form-group has-feedback {{ $errors->has('no_api') ? 'has-error' : '' }}">

@@ -55,9 +55,20 @@
                   <div class="margin">
                     <button type="button" class="btn btn-primary" id="tracking-data"><i class="fa fa-fw fa-edit"></i> Kirim Data</button>
                   </div>
+
+                  
                </div>
 
-             
+               <div class="button-action">
+                  <span class="title-action">Cetak Dokumen Ini <br>(No Barang : <b>{{ $cnpibk->no_barang }}</b>)</span>
+
+                  <div class="margin">
+                    <a href="{{ url("cnpibk/tracking/print/".$id) }}" target="_blank"><button type="button" class="btn btn-success"><i class="fa fa-fw fa-print"></i> Cetak</button></a>
+                  </div>
+
+                  
+               </div>
+
             </div>
             <!-- /.box-body -->
           </div>

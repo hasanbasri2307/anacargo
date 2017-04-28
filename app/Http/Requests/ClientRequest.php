@@ -28,8 +28,6 @@ class ClientRequest extends FormRequest
             "name" => "required",
             "npwp" => "required",
             "address" => "required",
-            "phone_1" => "required"
-
         ];
     }
 
@@ -37,8 +35,7 @@ class ClientRequest extends FormRequest
         return [
             "name.required" => "Nama harus diisi.",
             "npwp.required" => "NPWP harus diisi.",
-            "address.required" => "Alamat harus diisi.",
-            "phone_1.required" => "Telepon 1 harus diisi."
+            "address.required" => "Alamat harus diisi."
         ];
     }
 }

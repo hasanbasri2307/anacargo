@@ -690,6 +690,7 @@ class CnpibkController extends Controller
     	$cnpibk = Cnpibk::find($id);
     	$detail_pungutan = DB::select("select *, detail_pungutan.id as idnya from detail_pungutan inner join detail_barang on detail_barang.id = detail_pungutan.detail_barang_id inner join jenis_pungutan on jenis_pungutan.id = detail_pungutan.kd_pungutan inner join jenis_tarif on jenis_tarif.id = detail_pungutan.kd_tarif where detail_barang.cnpibk_id = ? order by detail_pungutan.id asc",[$id]);
     	$data['status'] = true;
+        $data['id'] = $id;
     	$data['html'] = view('pages.cnpibk.show')->with(['cnpibk'=>$cnpibk,'detail_pungutan'=>$detail_pungutan])->render();
 
     	return response()->json($data);
@@ -813,9 +814,19 @@ class CnpibkController extends Controller
     public function tracking($id){
     	$data['title'] = "Tracking CN PIBK";
     	$data['cnpibk'] = Cnpibk::find($id);
-    	$data['tracking'] = StatusHistory::where("cnpibk_id",$id)->get();
+        $data['id'] = $id;
+    	$data['tracking'] = StatusHistory::where("cnpibk_id",$id)->orderBy("wk_rekam","asc")->get();
 
     	return view("pages.cnpibk.tracking",$data);
+    }
+
+    public function printTracking($id){
+        $data['title'] = "Print CN PIBK";
+        $data['cnpibk'] = Cnpibk::find($id);
+        $data['tracking'] = StatusHistory::where("cnpibk_id",$id)->orderBy("wk_rekam","asc")->get();
+
+        return view("pages.cnpibk.print_tracking",$data);
+
     }
 
     public function cekStatus(Request $request){
@@ -1058,6 +1069,16 @@ class CnpibkController extends Controller
         $cnpibk->save();
 
         return redirect("cnpibk")->with("success","Data berhasil dihapus");
+    }
+
+    public function print($id){
+        $cnpibk = Cnpibk::find($id);
+        $detail_pungutan = DB::select("select *, detail_pungutan.id as idnya from detail_pungutan inner join detail_barang on detail_barang.id = detail_pungutan.detail_barang_id inner join jenis_pungutan on jenis_pungutan.id = detail_pungutan.kd_pungutan inner join jenis_tarif on jenis_tarif.id = detail_pungutan.kd_tarif where detail_barang.cnpibk_id = ? order by detail_pungutan.id asc",[$id]);
+
+        $data['cnpibk'] = $cnpibk;
+        $data['detail_pungutan'] = $detail_pungutan;
+        $data['title'] = "Print CNPIBK";
+       return view('pages.cnpibk.print',$data);
     }
 
     private function clean($str){

@@ -190,7 +190,9 @@
                         
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Tutup</button>
+                        <button style="margin-left:10px;" type="button" class="btn btn-default pull-right" data-dismiss="modal">Tutup</button> 
+
+                        <a class="print-url" target="_blank"><button type="button" class="btn btn-primary pull-right">Cetak</button></a>
                       </div>
                     </div>
                     <!-- /.modal-content -->
@@ -212,6 +214,7 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Tutup</button>
+                        
                       </div>
                     </div>
                     <!-- /.modal-content -->
@@ -300,7 +303,7 @@
           var cnpibk_id = $(this).attr("data-id");
           $.get('{{ url("cnpibk/show/") }}/'+cnpibk_id, function(data) {
               if(data.status){
-
+                    $("#myModal").find(".print-url").attr("href","{{ url("cnpibk/print/") }}/"+data.id);
                     $("#cnpibk").html(data.html);
                     $("#myModal").modal("show");
               }
