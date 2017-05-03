@@ -113,10 +113,12 @@
               <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
+                  <th>Tanggal</th>
                   <th>Jenis AJU</th>
                   <th>Kode Jenis PIBK</th>
                   <th>No Barang</th>
                   <th>Data BC</th>
+                  
                   <th>Status Dokumen</th>
                   <th>Kirim Ke BC</th>
                   <th></th>
@@ -126,6 +128,7 @@
                 @if(count($cn) > 0)
                     @foreach($cn as $item)
                         <tr>
+                          <td>{{ $item->created_at }}</td>
                           <td>{{ (!empty($item->jns_aju) ? $item->aju->kode_aju.' ('.$item->aju->nama_aju.')' : "-") }}</td>
                           <td>{{ (!empty($item->kd_jns_pibk) ? $item->pibk->kode_pibk.' ('.$item->pibk->nama_pibk.')' : "-") }}</td>
                           <td>{{ (!empty($item->no_barang) ? $item->no_barang : "-") }}</td>
@@ -136,7 +139,7 @@
                                   <span class="label label-warning">Data BC Belum Lengkap</span>
                               @endif
                           </td>
-
+                          
                           <td>
                               <?php
                               $history = App\StatusHistory::where(['status_code_id'=>$item->status_code_id,'cnpibk_id'=>$item->id])->first();
@@ -169,7 +172,7 @@
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="5">Data Masih Kosong</td>
+                        <td colspan="6">Data Masih Kosong</td>
                     </tr>
                 @endif
                     

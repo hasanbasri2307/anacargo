@@ -63,7 +63,7 @@ Route::group(['middleware'=>'auth'],function(){
 	Route::get("cnpibk/pdf/{id}","CnpibkController@pdf");
 	Route::get("cnpibk/lartas/{id}","CnpibkController@lartas");
 	Route::delete("cnpibk/delete/{id}","CnpibkController@delete");
-	Route::get("cnpibk/print/{id}","CnpibkController@print");
+	Route::get("cnpibk/print/{id}","CnpibkController@prints");
 	Route::get("cnpibk/tracking/print/{id}","CnpibkController@printTracking");
 
 	Route::get("cnpibk/download/pdf/{filename}",function($filename){

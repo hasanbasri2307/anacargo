@@ -33,7 +33,7 @@ class CnpibkController extends Controller
         Session::forget("jenis_aju");
 
     	$data['title'] = "CN";
-    	$data['cn'] = Cnpibk::paginate(10);
+    	$data['cn'] = Cnpibk::orderBy("id","desc")->paginate(10);
 
     	return view("pages.cnpibk.index",$data);
     }
@@ -578,7 +578,7 @@ class CnpibkController extends Controller
 						$barang->addChild("UR_BRG",(!empty($item->ur_brg) ? $item->ur_brg : 'NA'));
 						$barang->addChild("KD_NEG_ASAL",(!empty($item->kd_neg_asal) ? $item->kd_neg_asal : 'NA'));
 						$barang->addChild("JML_KMS",(!empty($item->jml_kms) ? $item->jml_kms : '0.00'));
-						$barang->addChild("JNS_KMS",(!empty($item->jml_kms) ? $item->jml_kms : '0.00'));
+						$barang->addChild("JNS_KMS",(!empty($item->jns_kms) ? $item->jns_kms : ''));
 						$barang->addChild("CIF",(!empty($item->cif) ? $item->cif : '0.00'));
 						$barang->addChild("KD_SAT_HRG",(!empty($item->kd_sat_hrg) ? $item->kd_sat_hrg : ''));
 						$barang->addChild("JML_SAT_HRG",(!empty($item->jml_sat_hrg) ? $item->jml_sat_hrg : '0.00'));
@@ -615,45 +615,45 @@ class CnpibkController extends Controller
 					"sign" => Config::get("sayapbiru.token")  
 				);
 				$response = $webServiceClient->__soapCall("kirimData", array("kirimData" => $requestData));
-						$respon_string= simplexml_load_string($response->return);
+				$respon_string= simplexml_load_string($response->return);
 
-                        if($respon_string == NULL){
-                            return response()->json(['status'=>false,'response'=>["Ada kesalahan dari Bea Cukai, silahkan coba lagi nanti."]]);
-                        }
+                if($respon_string == NULL){
+                    return response()->json(['status'=>false,'response'=>["Ada kesalahan dari Bea Cukai, silahkan coba lagi nanti."]]);
+                }
 
-                        $status_code = $respon_string->HEADER->KD_RESPON;
+                $status_code = $respon_string->HEADER->KD_RESPON;
 
-                        if($status_code == "ERR"){
-                            return response()->json(['status'=>false,'response'=>$respon_string->HEADER->KET_RESPON]);
-                        }
+                if($status_code == "ERR"){
+                    return response()->json(['status'=>false,'response'=>$respon_string->HEADER->KET_RESPON]);
+                }
 
-						DB::transaction(function () use($respon_string,$id) {
-							//set latest status code
-							$status_code = $respon_string->HEADER->KD_RESPON;
-							$status_code_model = StatusCode::where("kode",$status_code)->first();
-							$cnpibk_update = Cnpibk::find($id);
-							$cnpibk_update->status_code_id = $status_code_model->id;
-							$cnpibk_update->save();
+				DB::transaction(function () use($respon_string,$id) {
+					//set latest status code
+					$status_code = $respon_string->HEADER->KD_RESPON;
+					$status_code_model = StatusCode::where("kode",$status_code)->first();
+					$cnpibk_update = Cnpibk::find($id);
+					$cnpibk_update->status_code_id = $status_code_model->id;
+					$cnpibk_update->save();
 
-							$status_history_model = StatusHistory::where(['status_code_id'=>$status_code_model->id,'cnpibk_id'=>$id])->count();
-							if($status_history_model == 0){
-								$new_status_history = new StatusHistory();
-								$new_status_history->status_code_id = $status_code_model->id;
-								$new_status_history->cnpibk_id = $id;
-								$new_status_history->ket_respon = $respon_string->HEADER->KET_RESPON;
-								$new_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($respon_string->HEADER->WK_REKAM));
-								$new_status_history->save();
-							}else{
-								$update_status_history = StatusHistory::where(['cnpibk_id'=>$id,'status_code_id'=>$status_code_model->id])->first();
-								$update_status_history->status_code_id = $status_code_model->id;
-								$update_status_history->ket_respon = $respon_string->HEADER->KET_RESPON;
-								$update_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($respon_string->HEADER->WK_REKAM));
-								$update_status_history->save();
-							}
-						},2);
+					$status_history_model = StatusHistory::where(['status_code_id'=>$status_code_model->id,'cnpibk_id'=>$id])->count();
+					if($status_history_model == 0){
+						$new_status_history = new StatusHistory();
+						$new_status_history->status_code_id = $status_code_model->id;
+						$new_status_history->cnpibk_id = $id;
+						$new_status_history->ket_respon = $respon_string->HEADER->KET_RESPON;
+						$new_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($respon_string->HEADER->WK_REKAM));
+						$new_status_history->save();
+					}else{
+						$update_status_history = StatusHistory::where(['cnpibk_id'=>$id,'status_code_id'=>$status_code_model->id])->first();
+						$update_status_history->status_code_id = $status_code_model->id;
+						$update_status_history->ket_respon = $respon_string->HEADER->KET_RESPON;
+						$update_status_history->wk_rekam = date("Y-m-d H:i:s",strtotime($respon_string->HEADER->WK_REKAM));
+						$update_status_history->save();
+					}
+				},2);
 
-						return response()->json(['status'=>true]);
-				}
+				return response()->json(['status'=>true]);
+			}
 				catch (SoapFault $exception) {
 						return response()->json(['status'=>false,'response'=>$exception]);    
 			}
@@ -1071,7 +1071,7 @@ class CnpibkController extends Controller
         return redirect("cnpibk")->with("success","Data berhasil dihapus");
     }
 
-    public function print($id){
+    public function prints($id){
         $cnpibk = Cnpibk::find($id);
         $detail_pungutan = DB::select("select *, detail_pungutan.id as idnya from detail_pungutan inner join detail_barang on detail_barang.id = detail_pungutan.detail_barang_id inner join jenis_pungutan on jenis_pungutan.id = detail_pungutan.kd_pungutan inner join jenis_tarif on jenis_tarif.id = detail_pungutan.kd_tarif where detail_barang.cnpibk_id = ? order by detail_pungutan.id asc",[$id]);
 
