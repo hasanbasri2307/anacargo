@@ -903,7 +903,7 @@ class CnpibkController extends Controller
                     }
                 }
 
-                if($status_code == 303 || $status_code == 404 || $status_code == 403 || $status_code == 401 || $status_code == 402 || $status_code == 304 || $status_code == 306){                  
+                if($status_code == 303 || $status_code == 404 || $status_code == 403 || $status_code == 401 || $status_code == 402 || $status_code == 304 || $status_code == 306 || $status_code == 305){                  
                     $pdf_decoded = base64_decode($respon_string->HEADER->PDF);
                     $pdf = fopen(public_path("assets/pdf/".$id.'-'.$respon_string->HEADER->KD_RESPON.'-'.$respon_string->HEADER->NO_BARANG.'.pdf'),'w');
                     fwrite ($pdf,$pdf_decoded);
@@ -990,7 +990,7 @@ class CnpibkController extends Controller
                             }
                         }
 
-                        if($status_code == 303 || $status_code == 404 || $status_code == 403 || $status_code == 401 || $status_code == 402 || $status_code == 304 || $status_code == 306){
+                        if($status_code == 303 || $status_code == 404 || $status_code == 403 || $status_code == 401 || $status_code == 402 || $status_code == 304 || $status_code == 306 || $status_code == 305){
                             $pdf_decoded = base64_decode($object->HEADER->PDF);
                             $pdf = fopen(public_path("assets/pdf/".$cnpibk_update->id.'-'.$object->HEADER->KD_RESPON.'-'.$object->HEADER->NO_BARANG.'.pdf'),'w');
                             fwrite ($pdf,$pdf_decoded);
