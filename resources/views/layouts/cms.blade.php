@@ -46,7 +46,7 @@
                     <!-- mini logo for sidebar mini 50x50 pixels -->
                     <span class="logo-mini"><b>A</b>LT</span>
                     <!-- logo for regular state and mobile devices -->
-                    <span class="logo-lg"><b>SAYAP</b> BIRU</span>
+                    <span class="logo-lg"><b>BARANG</b> KIRIMAN</span>
                 </a>
                 <!-- Header Navbar: style can be found in header.less -->
                 <nav class="navbar navbar-static-top">
@@ -108,7 +108,7 @@
                     <div class="user-panel">
                        
                     </div>
-                    <img src="{{ asset("assets/images/logo.jpg") }}" width="180px;" style="margin-left: 23px;">
+                    <img src="{{ asset("assets/images/logo2.png") }}" width="180px;" style="margin-left: 23px;">
                     <!-- /.search form -->
                     <!-- sidebar menu: : style can be found in sidebar.less -->
                     <ul class="sidebar-menu">
@@ -150,7 +150,7 @@
                 <div class="pull-right hidden-xs">
                     <b>Version</b> 1.0.0
                 </div>
-                <strong>Copyright &copy; {{ date("Y") }} PT. Sayap Biru (ANACARGO).</strong> All rights
+                <strong>Copyright &copy; {{ date("Y") }} PT. TATA HARMONI SARANATAMA.</strong> All rights
                 reserved.
             </footer>
             <!-- Control Sidebar -->

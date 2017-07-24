@@ -1,15 +1,15 @@
 <?php
 
 return [
-	"company_name" => "PT Sayap Biru Ekspress",
+	"company_name" => "TATA HARMONI SARANATAMA",
 	"jenis_id_pemberitahu" => "5",
-	"no_id_pemberitahu" => "033466301077000",
-	"nm_pemberitahu" => "PT.Sayap Biru Ekspres",
-	"alamat_pemberitahu" => "JL. PEJOMPONGAN III NO 7 BENDUNGAN HILIR, JAKARTA, INDONESIA",
-	"no_izin_pemberitahu" => "S3692",
-	"tgl_izin_pemberitahu" => "2016/07/12",
+	"no_id_pemberitahu" => "018491456036000",
+	"nm_pemberitahu" => "PT.Tata Harmoni Saranatama",
+	"alamat_pemberitahu" => "JL. JALAN P. TUBAGUS ANGKE KOMPLEK TAMAN DUTAMAS BLOK B1 NO.27 JAKARTA",
+	"no_izin_pemberitahu" => "S2366",
+	"tgl_izin_pemberitahu" => "2004/09/06",
 	"kd_kantor" => "050100",
 	"kd_jenis_angkut" => "4",
-	"id" => "trijoko1945"."^$"."sbejkt@1945",
-	"token" => "TURNek5EWTJNekF4TFRFMw0K"
+	"id" => "018491456036"."^$"."THS5678289",
+	"token" => "TURFNE5Ea3hORFUyTFRFMw0K"
 ];
