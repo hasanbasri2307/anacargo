@@ -18,70 +18,72 @@ Auth::routes();
 
 
 Route::group(['middleware'=>'auth'],function(){
-	Route::get('/home', 'HomeController@index');
-	//client
-	Route::get("customers","CustomerController@index");
-	Route::get("customer/create","CustomerController@create");
-	Route::post("customer/store","CustomerController@store");
-	Route::get("customer/edit/{id}","CustomerController@edit");
-	Route::post("customer/update/{id}","CustomerController@update");
-	Route::get("customer/show/{id}","CustomerController@show");
-	Route::delete("customer/delete/{id}","CustomerController@delete");
-	Route::get("customer/import","CustomerController@showImport");
-	Route::post("customer/import","CustomerController@doImport");
+    Route::get('/home', 'HomeController@index');
+    //client
+    Route::get("customers","CustomerController@index");
+    Route::get("customer/create","CustomerController@create");
+    Route::post("customer/store","CustomerController@store");
+    Route::get("customer/edit/{id}","CustomerController@edit");
+    Route::post("customer/update/{id}","CustomerController@update");
+    Route::get("customer/show/{id}","CustomerController@show");
+    Route::delete("customer/delete/{id}","CustomerController@delete");
+    Route::get("customer/import","CustomerController@showImport");
+    Route::post("customer/import","CustomerController@doImport");
 
-	//user
-	Route::get("users","UserController@index");
-	Route::get("user/create","UserController@create");
-	Route::post("user/store","UserController@store");
-	Route::get("user/edit/{id}","UserController@edit");
-	Route::patch("user/update/{id}","UserController@update");
-	Route::get("user/show/{id}","UserController@show");
-	Route::get("user/change-password/{id}","UserController@changePasswordForm");
-	Route::post("user/change-password/{id}","UserController@changePassword");
-	Route::delete("user/delete/{id}","UserController@delete");
-	Route::get("user/profile","UserController@showProfile");
-	Route::post("user/profile","UserController@profile");
-	Route::post("user/profile/change-password","UserController@profileChangePassword");
+    //user
+    Route::get("users","UserController@index");
+    Route::get("user/create","UserController@create");
+    Route::post("user/store","UserController@store");
+    Route::get("user/edit/{id}","UserController@edit");
+    Route::patch("user/update/{id}","UserController@update");
+    Route::get("user/show/{id}","UserController@show");
+    Route::get("user/change-password/{id}","UserController@changePasswordForm");
+    Route::post("user/change-password/{id}","UserController@changePassword");
+    Route::delete("user/delete/{id}","UserController@delete");
+    Route::get("user/profile","UserController@showProfile");
+    Route::post("user/profile","UserController@profile");
+    Route::post("user/profile/change-password","UserController@profileChangePassword");
 
 
-	//cn pibk
-	Route::get("cnpibk",'CnpibkController@index');
-	Route::get("cnpibk/create",'CnpibkController@create');
-	Route::get("cnpibk/show/{id}",'CnpibkController@showById');
-	Route::post("cnpibk/store",'CnpibkController@store');
-	Route::get("cnpibk/edit/{id}",'CnpibkController@edit');
-	Route::post("cnpibk/update/{id}",'CnpibkController@update');
-	Route::post("cnpibk/delete/header-pungutan",'CnpibkController@deleteHeaderPungutan');
-	Route::post("cnpibk/delete/detail-barang",'CnpibkController@deleteDetailBarang');
-	Route::get("cnpibk/editbc11/{id}",'CnpibkController@editBc11');
-	Route::post("cnpibk/updatebc/{id}",'CnpibkController@updateBc11');
-	Route::get("cnpibk/tracking/{id}",'CnpibkController@tracking');
-	Route::post("cnpibk/cekstatus",'CnpibkController@cekStatus');
-	Route::get("cnpibk/getallresponse",'CnpibkController@getAllResponse');
-	Route::post("cnpibk/search","CnpibkController@search");
-	Route::get("cnpibk/pdf/{id}","CnpibkController@pdf");
-	Route::get("cnpibk/lartas/{id}","CnpibkController@lartas");
-	Route::delete("cnpibk/delete/{id}","CnpibkController@delete");
-	Route::get("cnpibk/print/{id}","CnpibkController@prints");
-	Route::get("cnpibk/tracking/print/{id}","CnpibkController@printTracking");
+    //cn pibk
+    Route::get("cnpibk",'CnpibkController@index');
+    Route::get("cnpibk/create",'CnpibkController@create');
+    Route::get("cnpibk/show/{id}",'CnpibkController@showById');
+    Route::post("cnpibk/store",'CnpibkController@store');
+    Route::get("cnpibk/edit/{id}",'CnpibkController@edit');
+    Route::post("cnpibk/update/{id}",'CnpibkController@update');
+    Route::post("cnpibk/delete/header-pungutan",'CnpibkController@deleteHeaderPungutan');
+    Route::post("cnpibk/delete/detail-barang",'CnpibkController@deleteDetailBarang');
+    Route::get("cnpibk/editbc11/{id}",'CnpibkController@editBc11');
+    Route::post("cnpibk/updatebc/{id}",'CnpibkController@updateBc11');
+    Route::get("cnpibk/tracking/{id}",'CnpibkController@tracking');
+    Route::post("cnpibk/cekstatus",'CnpibkController@cekStatus');
+    Route::get("cnpibk/getallresponse",'CnpibkController@getAllResponse');
+    Route::post("cnpibk/search","CnpibkController@search");
+    Route::get("cnpibk/pdf/{id}","CnpibkController@pdf");
+    Route::get("cnpibk/lartas/{id}","CnpibkController@lartas");
+    Route::delete("cnpibk/delete/{id}","CnpibkController@delete");
+    Route::get("cnpibk/print/{id}","CnpibkController@prints");
+    Route::get("cnpibk/tracking/print/{id}","CnpibkController@printTracking");
+    Route::post("cnpibk/set/session","CnpibkController@setSessionSelectedCnpibk");
+    Route::get("cnpibk/check/session","CnpibkController@checkSessionSelectedCnpibk");
 
-	Route::get("cnpibk/download/pdf/{filename}",function($filename){
-		return response()->download(public_path().'/assets/pdf/'.$filename);
-	});
+    Route::get("cnpibk/download/pdf/{filename}",function($filename){
+        return response()->download(public_path().'/assets/pdf/'.$filename);
+    });
 
-	Route::get("cnpibk/download/xml/{filename}",function($filename){
-		return response()->download(public_path().'/assets/xml/'.$filename);
-	});
+    Route::get("cnpibk/download/xml/{filename}",function($filename){
+        return response()->download(public_path().'/assets/xml/'.$filename);
+    });
 
-	//customer
-	Route::get("customer/get/{id}",'CustomerController@getById');
+    //customer
+    Route::get("customer/get/{id}",'CustomerController@getById');
 
-	//jenis angkutan
-	Route::get("jenisAngkutan/get/{id}",'JenisAngkutanController@getById');
+    //jenis angkutan
+    Route::get("jenisAngkutan/get/{id}",'JenisAngkutanController@getById');
 
-	//
-	Route::post("sendpibk","CnpibkController@sendPiBk");
+    //
+    Route::post("sendpibk","CnpibkController@sendPiBk");
 });
 
 Route::get("testing","CnpibkController@testing");
