@@ -228,7 +228,7 @@
                             </div>
                             <div class="form-group has-feedback">
                                 <label for="exampleInputEmail1">Total Dibayar</label>
-                                {!! Form::text("tot_dibayar",old("tot_dibayar"),['class'=>"form-control","placeholder"=>"Total Dibayar"]) !!}
+                                {!! Form::text("tot_dibayar",old("tot_dibayar"),['class'=>"form-control","placeholder"=>"Total Dibayar" , "readonly" => "readonly"]) !!}
 
                                 <span class="help-block"></span>
                             </div>
