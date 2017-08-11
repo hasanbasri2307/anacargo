@@ -674,26 +674,20 @@
                 var fob = $(e).val() == "" ? 0 : parseFloat($(e).val());
                 var freight = $('input[name="freight"]').val() == "" ? 0 : parseFloat($('input[name="freight"]').val());
                 var asuransi = $("input[name='asuransi']").val() == "" ? 0 : parseFloat($("input[name='asuransi']").val());
-
-                total = fob + freight + asuransi;
-                $cif.val(total);
             } else if ($(e).attr("name") == "asuransi") {
                 var asuransi = $(e).val() == "" ? 0 : parseFloat($(e).val());
                 var freight = $('input[name="freight"]').val() == "" ? 0 : parseFloat($('input[name="freight"]').val());
                 var fob = $("input[name='fob']").val() == "" ? 0 : parseFloat($("input[name='fob']").val());
-
-                total = fob + freight + asuransi;
-                $cif.val(total);
             } else if ($(e).attr("name") == "freight") {
                 var freight = $(e).val() == "" ? 0 : parseFloat($(e).val());
                 var asuransi = $('input[name="asuransi"]').val() == "" ? 0 : parseFloat($('input[name="asuransi"]').val());
                 var fob = $("input[name='fob']").val() == "" ? 0 : parseFloat($("input[name='fob']").val());
-
-                total = fob + freight + asuransi;
-                $cif.val(total);
             }
 
-            $("#detail_barang").find(".cif").val(total);
+            total = fob + freight + asuransi;
+            $cif.val(total.toFixed(2));
+
+            $("#detail_barang").find(".cif").val(total.toFixed(2));
         }
 
         function hitungAsuransi() {
@@ -914,7 +908,7 @@
             //netto bruto
             $("input[name='netto']").on("blur", function () {
                 $("input[name='bruto']").val(parseFloat($(this).val()) + 1);
-            })
+            });
 
             $("#form_cn").submit(function (e) {
                 e.preventDefault();
