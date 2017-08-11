@@ -57,19 +57,19 @@
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">Kode Pelabuhan Bongkar</label>
-                                    {!! Form::text("kd_pel_bongkar","IDCGK",['class'=>"form-control","placeholder"=>"Kode Pelabuhan Bongkar",'maxlength'=>5]) !!}
+                                    {!! Form::text("kd_pel_bongkar","IDCGK",['class'=>"form-control","placeholder"=>"Kode Pelabuhan Bongkar",'maxlength'=>5 , "readonly" => "readonly"]) !!}
 
                                     <span class="help-block"></span>
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">Kode Gudang</label>
-                                    {!! Form::text("kd_gudang","GIJT",['class'=>"form-control","placeholder"=>"Kode Gudang",'maxlength'=>4]) !!}
+                                    {!! Form::text("kd_gudang","GIJT",['class'=>"form-control","placeholder"=>"Kode Gudang",'maxlength'=>4, "readonly" => "readonly"]) !!}
 
                                     <span class="help-block"></span>
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">No Invoice</label>
-                                    {!! Form::text("no_invoice",old("no_invoice"),['class'=>"form-control","placeholder"=>"Nomor Invoice",'maxlength'=>20]) !!}
+                                    {!! Form::text("no_invoice",old("no_invoice"),['class'=>"form-control","placeholder"=>"Nomor Invoice",'maxlength'=>20, "readonly" => "readonly"]) !!}
 
                                     <span class="help-block"></span>
                                 </div>
@@ -157,7 +157,7 @@
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">No House Blawb</label>
-                                    {!! Form::text("no_house_blawb",old("no_house_blawb"),['class'=>"form-control","placeholder"=>"No House Blawb",'maxlength'=>30]) !!}
+                                    {!! Form::text("no_house_blawb",old("no_house_blawb"),['class'=>"form-control","placeholder"=>"No House Blawb",'maxlength'=>30,"readonly" => "readonly"]) !!}
 
                                     <span class="help-block"></span>
                                 </div>
@@ -176,7 +176,7 @@
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">Kode Valas</label>
-                                    {!! Form::text("kd_valas","USD",['class'=>"form-control","placeholder"=>"Kode Valas",'maxlength'=>3]) !!}
+                                    {!! Form::text("kd_valas","USD",['class'=>"form-control","placeholder"=>"Kode Valas",'maxlength'=>3,"readonly" => "readonly"]) !!}
 
                                     <span class="help-block"></span>
                                 </div>
@@ -225,7 +225,7 @@
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">Total Dibayar</label>
-                                    {!! Form::text("tot_dibayar",old("tot_dibayar"),['class'=>"form-control","placeholder"=>"Total Dibayar"]) !!}
+                                    {!! Form::text("tot_dibayar",old("tot_dibayar"),['class'=>"form-control","placeholder"=>"Total Dibayar" ,"readonly" => "readonly"]) !!}
 
                                     <span class="help-block"></span>
                                 </div>
@@ -345,7 +345,7 @@
                                     <select name="jns_id_penerima" class="form-control select2">
                                         <option disabled selected value> -- Pilih --</option>
                                         @foreach($jenis_id as $item)
-                                            <option value="{{ $item->id }}">{{ $item->jns_id }}
+                                            <option value="{{ $item->id }}" {{ $item->jns_id == 5 ? "selected" : "" }}>{{ $item->jns_id }}
                                                 - {{ $item->nama }}</option>
                                         @endforeach
                                     </select>
@@ -709,10 +709,9 @@
             var tarifBm = $(e).val() == "" ? 0 : parseFloat($(e).val());
             var cif = $("input[name='cif']").val();
             var ndpbm = $("input[name='ndpbm']").val();
-            var nilaiBm = (parseFloat(cif) + parseFloat(ndpbm)) * tarifBm;
+            var nilaiBm = (parseFloat(cif) * parseFloat(ndpbm)) * tarifBm /100;
 
-
-            $(e).parent().parent().find("#"+arr[1]+"_"+arr[2]).val(Math.ceil(nilaiBm/100) * 100);
+            $(e).parent().parent().find("#"+arr[1]+"_"+arr[2]).val(Math.ceil(nilaiBm/1000) * 1000);
         }
 
         function hitungPpn(e) {
@@ -723,9 +722,9 @@
             var cif = $("input[name='cif']").val();
             var ndpbm = $("input[name='ndpbm']").val();
             var nilaiBm = $(e).parent().parent().parent().find("#BM_"+arr[2]).val();
-            var nilaiPpn = ((parseFloat(cif) + parseFloat(ndpbm)) + parseFloat(nilaiBm)) * tarifPpn;
+            var nilaiPpn = ((parseFloat(cif) * parseFloat(ndpbm)) + parseFloat(nilaiBm)) * tarifPpn/100;
 
-            $(e).parent().parent().find("#"+arr[1]+"_"+arr[2]).val(Math.ceil(nilaiPpn/100) * 100);
+            $(e).parent().parent().find("#"+arr[1]+"_"+arr[2]).val(Math.ceil(nilaiPpn/1000) * 1000);
         }
 
         function hitungPph(e) {
@@ -736,10 +735,10 @@
             var cif = $("input[name='cif']").val();
             var ndpbm = $("input[name='ndpbm']").val();
             var nilaiBm = $(e).parent().parent().parent().find("#BM_"+arr[2]).val();
-            var nilaiPph = ((parseFloat(cif) + parseFloat(ndpbm)) + parseFloat(nilaiBm)) * tarifPph;
+            var nilaiPph = ((parseFloat(cif) * parseFloat(ndpbm)) + parseFloat(nilaiBm)) * tarifPph/100;
 
 
-            $(e).parent().parent().find("#"+arr[1]+"_"+arr[2]).val(Math.ceil(nilaiPph/100) * 100);
+            $(e).parent().parent().find("#"+arr[1]+"_"+arr[2]).val(Math.ceil(nilaiPph/1000) * 1000);
         }
 
         function hitungPpnbm(e) {
@@ -750,9 +749,9 @@
             var cif = $("input[name='cif']").val();
             var ndpbm = $("input[name='ndpbm']").val();
             var nilaiBm = $(e).parent().parent().parent().find("#BM_"+arr[2]).val();
-            var nilaiPpnbm = ((parseFloat(cif) + parseFloat(ndpbm)) + parseFloat(nilaiBm)) * tarifPpnbm;
+            var nilaiPpnbm = ((parseFloat(cif) * parseFloat(ndpbm)) + parseFloat(nilaiBm)) * tarifPpnbm/100;
 
-            $(e).parent().parent().find("#"+arr[1]+"_"+arr[2]).val(Math.ceil(nilaiPpnbm/100) * 100);
+            $(e).parent().parent().find("#"+arr[1]+"_"+arr[2]).val(Math.ceil(nilaiPpnbm/1000) * 1000);
         }
 
 
@@ -894,11 +893,9 @@
             //no barang and no house blawb
             $("input[name='no_barang']").on("blur", function () {
                 $("input[name='no_house_blawb']").val($(this).val());
+                $("input[name='no_invoice']").val($(this).val());
             });
 
-            $("input[name='no_house_blawb']").on("blur", function () {
-                $("input[name='no_barang']").val($(this).val());
-            });
 
             //kode negara asal dan pengirim
             $("input[name='kd_negara_asal']").on("blur", function () {
