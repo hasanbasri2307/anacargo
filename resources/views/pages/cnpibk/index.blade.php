@@ -164,12 +164,17 @@
                                                 <label>
                                                     @if(Session::has("selected_cnpibk"))
                                                         @if(in_array($item->id,Session::get("selected_cnpibk")))
-                                                            <input type="checkbox" class="ids" name="ids[]" value="{{ $item->id }}" onchange="selectCnpibk(this)" checked>
+                                                            <input type="checkbox" class="ids" name="ids[]"
+                                                                   value="{{ $item->id }}" onchange="selectCnpibk(this)"
+                                                                   checked>
                                                         @else
-                                                            <input type="checkbox" class="ids" name="ids[]" value="{{ $item->id }}" onchange="selectCnpibk(this)">
+                                                            <input type="checkbox" class="ids" name="ids[]"
+                                                                   value="{{ $item->id }}"
+                                                                   onchange="selectCnpibk(this)">
                                                         @endif
                                                     @else
-                                                        <input type="checkbox" class="ids" name="ids[]" value="{{ $item->id }}" onchange="selectCnpibk(this)">
+                                                        <input type="checkbox" class="ids" name="ids[]"
+                                                               value="{{ $item->id }}" onchange="selectCnpibk(this)">
                                                     @endif
                                                 </label>
                                             </div>
@@ -375,7 +380,7 @@
 
         }
 
-        function selectCnpibk(e){
+        function selectCnpibk(e) {
             let val = $(e).val();
             let checked = 0;
 
@@ -387,8 +392,8 @@
 
             $.post('{{ url("cnpibk/set/session") }}', {
                 "cnpibk_id": val,
-                "checked" : checked,
-                "_token" : "{{ csrf_token() }}"
+                "checked": checked,
+                "_token": "{{ csrf_token() }}"
             }, function (data, textStatus, xhr) {
                 console.log(data);
             });
@@ -473,7 +478,7 @@
                 }
             });
 
-            $("#kirim-bc-all").on("click",function(){
+            $("#kirim-bc-all").on("click", function () {
                 $(this).prop("disabled", true);
                 $(this).text("Sedang Proses");
                 $.get('{{ url("cnpibk/check/session") }}', function (data) {
@@ -489,9 +494,9 @@
                             window.location.replace('{{ url("cnpibk") }}');
                         }, 1000);
                     } else {
-                        if("response" in data){
+                        if ("response" in data) {
                             $("#notif").html('<div class="alert alert-error"><strong>Error!</strong> Ada kesalahan silahkan coba lagi nanti.</div>');
-                        }else{
+                        } else {
                             $("#notif").html('<div class="alert alert-error"><strong>Error!</strong> CNPIBK Belum dipilih.</div>');
                         }
 
@@ -501,6 +506,16 @@
 
                 });
             });
+
+            //every minutes ajax get all responses
+            var ajax_call = function () {
+                $.get('{{ url("cnpibk/getallresponse") }}', function (data) {
+                    window.location.replace('{{ url("cnpibk") }}');
+                });
+            };
+
+            var interval = 1000 * 60 * 0.5; // where X is your every X minutes
+            setInterval(ajax_call, interval);
 
         });
     </script>
