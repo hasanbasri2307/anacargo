@@ -188,26 +188,26 @@
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">FOB</label>
-                                    {!! Form::text("fob",old("fob"),['class'=>"form-control","placeholder"=>"FOB",'onchange'=>'hitungCif(this)',"onblur" => 'hitungAsuransi()']) !!}
+                                    {!! Form::text("fob",old("fob"),['class'=>"form-control","placeholder"=>"FOB","onblur" => 'hitungAsuransi();hitungCif(this);']) !!}
 
                                     <span class="help-block"></span>
                                 </div>
 
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">Freight</label>
-                                    {!! Form::text("freight",old("freight"),['class'=>"form-control","placeholder"=>"Freight",'onchange'=>'hitungCif(this)','onblur' => 'hitungAsuransi()']) !!}
+                                    {!! Form::text("freight",old("freight"),['class'=>"form-control","placeholder"=>"Freight",'onblur' => 'hitungAsuransi();hitungCif(this);']) !!}
 
                                     <span class="help-block"></span>
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">Asuransi</label>
-                                    {!! Form::text("asuransi",old("fob"),['class'=>"form-control","placeholder"=>"Asuransi",'onchange'=>'hitungCif(this)']) !!}
+                                    {!! Form::text("asuransi",old("fob"),['class'=>"form-control","placeholder"=>"Asuransi",'readonly' => true]) !!}
 
                                     <span class="help-block"></span>
                                 </div>
                                 <div class="form-group has-feedback">
                                     <label for="exampleInputEmail1">CIF</label>
-                                    {!! Form::text("cif",old("cif"),['class'=>"form-control","placeholder"=>"CIF"]) !!}
+                                    {!! Form::text("cif",old("cif"),['class'=>"form-control","placeholder"=>"CIF",'readonly' => true]) !!}
 
                                     <span class="help-block"></span>
                                 </div>
@@ -692,6 +692,8 @@
                 total = fob + freight + asuransi;
                 $cif.val(total);
             }
+
+            $("#detail_barang").find(".cif").val(total);
         }
 
         function hitungAsuransi() {
